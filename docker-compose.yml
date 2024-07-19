@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: coduo_mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE:
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init:/docker_entrypoint-initdb.d
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+
+  springboot:
+    build: .
+    container_name: coduo_server
+    ports:
+      - "7474:8080"
+    depends_on:
+      - mysql
+    restart:
+      always
+    environment:
+      - SPRING_JPA_HIBERNATE_DDL-AUTO=create
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
+      - SPRING_DATASOURCE_USERNAME=
+      - SPRING_DATASOURCE_PASSWORD=
